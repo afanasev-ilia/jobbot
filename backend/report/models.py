@@ -1,46 +1,39 @@
+from django.contrib.auth import get_user_model
 from django.db import models
 
-class Recipe(TimestampedModel):
-    author = models.ForeignKey(
+User = get_user_model()
+
+
+class Report(models.Model):
+    employee = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        verbose_name='автор',
-        help_text='укажите автора',
+        verbose_name='сотрудник',
+        help_text='укажите сотрудника',
     )
-    name = models.CharField(
-        'название рецепта',
-        max_length=200,
-        help_text='укажите название рецепта',
+    order = models.PositiveSmallIntegerField(
+        'номер заказа покупателя',
+        help_text='укажите номер заказа покупателя',
+    )
+    item_order = models.PositiveSmallIntegerField(
+        'номер позиции в заказе покупателя',
+        help_text='укажите номер позиции в заказе покупателя',
+    )
+    execution_time = models.PositiveSmallIntegerField(
+        'время выполнения(минут)',
+        help_text='укажите время выполнения в минутах',
     )
     image = models.ImageField(
-        'изображение',
-        upload_to='recipes/',
-        help_text='добавьте изображение',
+        'фотография',
+        upload_to='image/',
+        help_text='добавьте фотографию',
     )
-    text = models.TextField(
-        'текстовое описание',
-        help_text='введите текстовое описание',
-    )
-    ingredients = models.ManyToManyField(
-        Ingredient,
-        through='IngredientAmount',
-        verbose_name='ингредиенты',
-        help_text='выберите ингредиенты',
-    )
-    tags = models.ManyToManyField(
-        Tag,
-        verbose_name='теги',
-        help_text='выберите теги',
-    )
-    cooking_time = models.IntegerField(
-        'время приготовления (в минутах)',
-        validators=[
-            MinValueValidator(1, message='значение должно быть больше 1'),
-        ],
-        help_text='укажите время приготовления (в минутах)',
+    report_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='время заполнения отчета',
     )
 
     class Meta:
-        default_related_name = 'recipes'
-        verbose_name = 'рецепт'
-        verbose_name_plural = 'рецепты'
+        default_related_name = 'report'
+        verbose_name = 'отчет'
+        verbose_name_plural = 'отчеты'
