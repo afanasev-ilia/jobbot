@@ -4,6 +4,7 @@ from django.db import models
 class Employee(models.Model):
     external_id = models.PositiveIntegerField(
         'ID cотрудника в Telegram',
+        unique=True,
         help_text='укажите ID cотрудника в Telegram',
     )
     full_name = models.CharField(
@@ -16,6 +17,9 @@ class Employee(models.Model):
         default_related_name = 'employee'
         verbose_name = 'сотрудник'
         verbose_name_plural = 'сотрудники'
+
+    def __str__(self) -> str:
+        return self.full_name
 
 
 class Report(models.Model):
@@ -39,6 +43,7 @@ class Report(models.Model):
     )
     image = models.ImageField(
         'фотография',
+        blank=True,
         upload_to='image/',
         help_text='добавьте фотографию',
     )
