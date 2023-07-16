@@ -1,13 +1,27 @@
-from django.contrib.auth import get_user_model
 from django.db import models
 
-User = get_user_model()
+
+class Employee(models.Model):
+    external_id = models.PositiveIntegerField(
+        'ID cотрудника в Telegram',
+        help_text='укажите ID cотрудника в Telegram',
+    )
+    full_name = models.CharField(
+        'ФИО сотрудника',
+        max_length=150,
+        help_text='укажите ФИО cотрудника',
+    )
+
+    class Meta:
+        default_related_name = 'employee'
+        verbose_name = 'сотрудник'
+        verbose_name_plural = 'сотрудники'
 
 
 class Report(models.Model):
     employee = models.ForeignKey(
-        User,
-        on_delete=models.CASCADE,
+        Employee,
+        on_delete=models.PROTECT,
         verbose_name='сотрудник',
         help_text='укажите сотрудника',
     )
