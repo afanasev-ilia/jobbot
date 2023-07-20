@@ -78,16 +78,32 @@ class Command(BaseCommand):
             ],
             states={
                 ORDER: [
-                    MessageHandler(Filters.all, order_handler, pass_user_data=True),
+                    MessageHandler(
+                        Filters.all,
+                        order_handler,
+                        pass_user_data=True,
+                    ),
                 ],
                 ITEM_ORDER: [
-                    MessageHandler(Filters.all, item_handler, pass_user_data=True),
+                    MessageHandler(
+                        Filters.all,
+                        item_handler,
+                        pass_user_data=True,
+                    ),
                 ],
                 EXECUTION_TIME: [
-                    MessageHandler(Filters.all, time_handler, pass_user_data=True),
+                    MessageHandler(
+                        Filters.all,
+                        time_handler,
+                        pass_user_data=True,
+                    ),
                 ],
                 IMAGE: [
-                    MessageHandler(Filters.all, image_handler, pass_user_data=True),
+                    MessageHandler(
+                        Filters.all,
+                        image_handler,
+                        pass_user_data=True,
+                    ),
                 ],
             },
             fallbacks=[
