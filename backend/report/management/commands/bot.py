@@ -27,8 +27,23 @@ def order_handler(update, context):
     return ITEM_ORDER
 
 
+def item_handler(update, context):
+    context.user_data[ITEM_ORDER] = update.message.text
+    update.message.reply_text('Укажите время выполнения в минутах')
+    return EXECUTION_TIME
+
+
+def time_handler(update, context):
+    context.user_data[EXECUTION_TIME] = update.message.text
+    update.message.reply_text('Приложите фотографию')
+    return IMAGE
+
+
+def image_handler(update, context):
+    print(context.user_data)
+
+
 def cancel_handler(update, context):
-    """Cancels and ends the conversation."""
     update.message.reply_text('Bye! I hope we can talk again some day.')
     return ConversationHandler.END
 
@@ -65,9 +80,15 @@ class Command(BaseCommand):
                 ORDER: [
                     MessageHandler(Filters.all, order_handler, pass_user_data=True),
                 ],
-                # ITEM_ORDER: [
-                #     MessageHandler(Filters.all, pass_user_data=True),
-                # ],
+                ITEM_ORDER: [
+                    MessageHandler(Filters.all, item_handler, pass_user_data=True),
+                ],
+                EXECUTION_TIME: [
+                    MessageHandler(Filters.all, time_handler, pass_user_data=True),
+                ],
+                IMAGE: [
+                    MessageHandler(Filters.all, image_handler, pass_user_data=True),
+                ],
             },
             fallbacks=[
                 CommandHandler('cancel', cancel_handler),
