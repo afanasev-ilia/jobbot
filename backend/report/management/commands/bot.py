@@ -3,12 +3,12 @@ from django.conf import settings
 
 from telegram import ReplyKeyboardMarkup, Update
 from telegram.ext import (
+    Application,
     CommandHandler,
-    ConversationHandler,
     ContextTypes,
-    Filters,
+    ConversationHandler,
     MessageHandler,
-    Updater,
+    filters,
 )
 
 
@@ -18,99 +18,95 @@ from report.models import Employee
 ORDER, ITEM_ORDER, EXECUTION_TIME, IMAGE = range(4)
 
 
-def work_report(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    update.message.reply_text('Введите номер счета что бы продолжить')
-    return ORDER
-
-
-def order_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    context.user_data[ORDER] = update.message.text
-    update.message.reply_text('Введите порядковый номер позиции из счета')
-    return ITEM_ORDER
-
-
-def item_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    context.user_data[ITEM_ORDER] = update.message.text
-    update.message.reply_text('Укажите время выполнения в минутах')
-    return EXECUTION_TIME
-
-
-def time_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    context.user_data[EXECUTION_TIME] = update.message.text
-    update.message.reply_text('Приложите фотографию')
-    return IMAGE
-
-
-def image_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    print(context.user_data)
-
-
-def cancel_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    update.message.reply_text('Отчет не отправлен')
-    return ConversationHandler.END
-
-
-def after_work_report(
-        update: Update,
-        context: ContextTypes.DEFAULT_TYPE,
-) -> int:
-    chat = update.effective_chat
-    context.bot.send_message(
-        chat_id=chat.id,
-        text='Отчет об уборке рабочего места',
-    )
-
-
-def wake_up(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     chat = update.effective_chat
     Employee.objects.get_or_create(external_id=chat.id)
     button = ReplyKeyboardMarkup(
         [['/work_report'], ['/after_work_report']], resize_keyboard=True
     )
-    context.bot.send_message(
+    await context.bot.send_message(
         chat_id=chat.id,
         text='Здравствуйте! Пожалуйста, выберите тип отчета',
         reply_markup=button,
     )
 
 
+async def work_report(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    await update.message.reply_text('Введите номер счета что бы продолжить')
+    return ORDER
+
+
+async def order_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    context.user_data[ORDER] = update.message.text
+    await update.message.reply_text('Введите порядковый номер позиции из счета')
+    return ITEM_ORDER
+
+
+async def item_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    context.user_data[ITEM_ORDER] = update.message.text
+    await update.message.reply_text('Укажите время выполнения в минутах')
+    return EXECUTION_TIME
+
+
+async def time_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    context.user_data[EXECUTION_TIME] = update.message.text
+    await update.message.reply_text('Приложите фотографию')
+    return IMAGE
+
+
+async def image_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    print(context.user_data)
+
+
+async def cancel_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+    await update.message.reply_text('Отчет не отправлен')
+    return ConversationHandler.END
+
+
+async def after_work_report(
+        update: Update,
+        context: ContextTypes.DEFAULT_TYPE,
+) -> int:
+    chat = update.effective_chat
+    await context.bot.send_message(
+        chat_id=chat.id,
+        text='Отчет об уборке рабочего места',
+    )
+
+
 class Command(BaseCommand):
-    help = 'Telegram-бот'
+    help = "Telegram-бот"
 
     def handle(self, *args, **options):
-        updater = Updater(token=settings.TELEGRAM_TOKEN)
+        application = (
+            Application.builder().token(token=settings.TELEGRAM_TOKEN).build()
+        )
 
-        report_handler = ConversationHandler(
-            entry_points=[
-                CommandHandler('work_report', work_report),
-            ],
+        conv_handler = ConversationHandler(
+            entry_points=[CommandHandler("start", start)],
             states={
                 ORDER: [
                     MessageHandler(
-                        Filters.all,
+                        filters.ALL,
                         order_handler,
-                        pass_user_data=True,
                     ),
                 ],
                 ITEM_ORDER: [
                     MessageHandler(
-                        Filters.all,
+                        filters.ALL,
                         item_handler,
-                        pass_user_data=True,
                     ),
                 ],
                 EXECUTION_TIME: [
                     MessageHandler(
-                        Filters.all,
+                        filters.ALL,
                         time_handler,
-                        pass_user_data=True,
                     ),
                 ],
                 IMAGE: [
                     MessageHandler(
-                        Filters.all,
+                        filters.ALL,
                         image_handler,
-                        pass_user_data=True,
                     ),
                 ],
             },
@@ -119,11 +115,15 @@ class Command(BaseCommand):
             ],
         )
 
-        updater.dispatcher.add_handler(CommandHandler('start', wake_up))
-        updater.dispatcher.add_handler(report_handler)
-        updater.dispatcher.add_handler(
-            CommandHandler('after_work_report', after_work_report)
-        )
+        application.add_handler(conv_handler)
 
-        updater.start_polling()
-        updater.idle()
+        application.run_polling(allowed_updates=Update.ALL_TYPES)
+
+        # updater.dispatcher.add_handler(CommandHandler('start', wake_up))
+        # updater.dispatcher.add_handler(report_handler)
+        # updater.dispatcher.add_handler(
+        #     CommandHandler('after_work_report', after_work_report)
+        # )
+
+        # updater.start_polling()
+        # updater.idle()
