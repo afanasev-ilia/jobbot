@@ -25,7 +25,7 @@ logging.basicConfig(
     ),
 )
 
-ORDER, ITEM_ORDER, EXECUTION_TIME, IMAGE = range(4)
+EMPLOYEE, ORDER, ITEM_ORDER, EXECUTION_TIME, IMAGE = 'employee', 'order', 'item_order', 'execution_time', 'image'
 
 
 def start(update: Update, context: CallbackContext) -> int:
@@ -46,6 +46,7 @@ def work_report(
         update: Update,
         context: CallbackContext,
 ) -> int:
+    context.user_data[EMPLOYEE] = update.effective_chat.id
     update.message.reply_text(
         'Введите номер счета что бы продолжить',
         reply_markup=ReplyKeyboardRemove(),
@@ -57,7 +58,7 @@ def order_handler(
         update: Update,
         context: CallbackContext
 ) -> int:
-    context.user_data[ORDER] = update.message.text
+    context.user_data[ORDER] = int(update.message.text)
     update.message.reply_text(
         'Введите порядковый номер позиции из счета',
     )
@@ -68,7 +69,7 @@ def item_handler(
         update: Update,
         context: CallbackContext
 ) -> int:
-    context.user_data[ITEM_ORDER] = update.message.text
+    context.user_data[ITEM_ORDER] = int(update.message.text)
     update.message.reply_text('Укажите время выполнения в минутах')
     return EXECUTION_TIME
 
@@ -77,7 +78,7 @@ def time_handler(
         update: Update,
         context: CallbackContext
 ) -> int:
-    context.user_data[EXECUTION_TIME] = update.message.text
+    context.user_data[EXECUTION_TIME] = int(update.message.text)
     update.message.reply_text('Приложите фотографию')
     return IMAGE
 

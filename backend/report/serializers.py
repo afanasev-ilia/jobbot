@@ -10,8 +10,7 @@ from report.models import Report
 class ReportSerializer(serializers.ModelSerializer):
     class Meta:
         model = Report
-        fields = ('employee', 'order', 'item_order', 'execution_time', 'image')
-        # exclude = ['id', ]
+        fields = ('employee', 'order', 'item_order', 'execution_time')
         # lookup_field = 'slug'
         # extra_kwargs = {
         #     'url': {'lookup_field': 'slug'}
