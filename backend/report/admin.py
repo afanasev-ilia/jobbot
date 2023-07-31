@@ -21,7 +21,6 @@ class ReportAdmin(admin.ModelAdmin):
     )
     search_fields = (
         'employee',
-        'order',
     )
     list_filter = (
         'employee',

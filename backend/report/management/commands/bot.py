@@ -1,5 +1,7 @@
 import logging
+import requests
 
+import base64
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from pathlib import Path
@@ -29,14 +31,13 @@ EMPLOYEE, ORDER, ITEM_ORDER, EXECUTION_TIME, IMAGE = 'employee', 'order', 'item_
 
 
 def start(update: Update, context: CallbackContext) -> int:
-    chat = update.effective_chat
-    Employee.objects.get_or_create(external_id=chat.id)
+    Employee.objects.get_or_create(external_id=update.effective_chat.id)
     button = ReplyKeyboardMarkup(
         [['Отчет о проделанной работе'], ['Отчет об уборке рабочего места']],
         resize_keyboard=True,
     )
     context.bot.send_message(
-        chat_id=chat.id,
+        chat_id=update.effective_chat.id,
         text='Здравствуйте! Пожалуйста, выберите тип отчета',
         reply_markup=button,
     )
@@ -46,7 +47,7 @@ def work_report(
         update: Update,
         context: CallbackContext,
 ) -> int:
-    context.user_data[EMPLOYEE] = update.effective_chat.id
+    context.user_data[EMPLOYEE] = Employee.objects.get(external_id=update.effective_chat.id).id
     update.message.reply_text(
         'Введите номер счета что бы продолжить',
         reply_markup=ReplyKeyboardRemove(),
@@ -88,6 +89,7 @@ def image_handler(
         context: CallbackContext
 ) -> int:
     update.message.reply_text('Спасибо! Отчет отправлен!')
+    requests.post(settings.ENDPOINT, json=context.user_data)
     print(context.user_data)
     return ConversationHandler.END
 

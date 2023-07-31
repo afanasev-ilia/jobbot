@@ -92,4 +92,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-DEFAULT_AUTO_FIELD='django.db.models.AutoField'
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+ENDPOINT = 'http://127.0.0.1:8000/api/v1/reports/'
