@@ -41,11 +41,7 @@ class Report(models.Model):
         'время выполнения(минут)',
         help_text='укажите время выполнения в минутах',
     )
-    image = models.ImageField(
-        'фотография',
-        blank=True,
-        upload_to='image/',
-        help_text='добавьте фотографию',
+    image = models.FilePathField(path='/media/image'
     )
     report_date = models.DateTimeField(
         auto_now_add=True,

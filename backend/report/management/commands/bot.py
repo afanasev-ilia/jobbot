@@ -1,7 +1,6 @@
 import logging
 import requests
 
-import base64
 from django.core.management.base import BaseCommand
 from django.conf import settings
 from pathlib import Path
@@ -88,6 +87,8 @@ def image_handler(
         update: Update,
         context: CallbackContext
 ) -> int:
+    
+    context.user_data[IMAGE] = ""
     update.message.reply_text('Спасибо! Отчет отправлен!')
     requests.post(settings.ENDPOINT, json=context.user_data)
     print(context.user_data)
