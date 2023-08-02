@@ -87,8 +87,19 @@ def image_handler(
         update: Update,
         context: CallbackContext
 ) -> int:
-    
-    context.user_data[IMAGE] = ""
+    print(update)
+    Path(f'media/{update.message.chat.id}').mkdir(parents=True, exist_ok=True)
+    file = update.message.photo[-1].get_file()
+    downloaded_file = file.download('downloaded_file.jpg')
+    src = f'media/{update.message.chat.id}' + 'downloaded_file.jpg'
+    with open(src, 'wb') as new_file:
+        new_file.write(downloaded_file)
+    # # явно указано имя файла!
+    # # откроем файл на чтение  преобразуем в base64
+    # with open(f'files/{message.chat.id}/photos/file_0.jpg', "rb") as image_file:
+    #     encoded_string = base64.b64encode(image_file.read())
+
+    # context.user_data[IMAGE] = encoded_string
     update.message.reply_text('Спасибо! Отчет отправлен!')
     requests.post(settings.ENDPOINT, json=context.user_data)
     print(context.user_data)
