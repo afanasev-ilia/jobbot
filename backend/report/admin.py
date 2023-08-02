@@ -20,11 +20,10 @@ class ReportAdmin(admin.ModelAdmin):
         'execution_time',
     )
     search_fields = (
-        'employee',
+        'order',
     )
     list_filter = (
         'employee',
-        'order',
     )
 
 @admin.register(Employee)

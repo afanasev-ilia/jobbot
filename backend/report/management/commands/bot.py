@@ -1,5 +1,6 @@
 import logging
 import requests
+import base64
 
 from django.core.management.base import BaseCommand
 from django.conf import settings
@@ -22,11 +23,17 @@ logging.basicConfig(
     filename=Path('program.log'),
     filemode='w',
     format=(
-        '%(name)s - %(asctime)s - %(levelname)s - %(lineno)d - %(message)s - %(funcName)s'
+        '%(name)s - %(asctime)s - %(levelname)s - %(lineno)d - %(message)s'
     ),
 )
 
-EMPLOYEE, ORDER, ITEM_ORDER, EXECUTION_TIME, IMAGE = 'employee', 'order', 'item_order', 'execution_time', 'image'
+EMPLOYEE, ORDER, ITEM_ORDER, EXECUTION_TIME, IMAGE = (
+    'employee',
+    'order',
+    'item_order',
+    'execution_time',
+    'image',
+)
 
 
 def start(update: Update, context: CallbackContext) -> int:
@@ -43,10 +50,12 @@ def start(update: Update, context: CallbackContext) -> int:
 
 
 def work_report(
-        update: Update,
-        context: CallbackContext,
+    update: Update,
+    context: CallbackContext,
 ) -> int:
-    context.user_data[EMPLOYEE] = Employee.objects.get(external_id=update.effective_chat.id).id
+    context.user_data[EMPLOYEE] = Employee.objects.get(
+        external_id=update.effective_chat.id
+    ).id
     update.message.reply_text(
         'Введите номер счета что бы продолжить',
         reply_markup=ReplyKeyboardRemove(),
@@ -83,26 +92,21 @@ def time_handler(
     return IMAGE
 
 
-def image_handler(
-        update: Update,
-        context: CallbackContext
-) -> int:
-    print(update)
-    Path(f'media/{update.message.chat.id}').mkdir(parents=True, exist_ok=True)
+def image_handler(update: Update, context: CallbackContext) -> int:
+    Path(f'media/temp/{update.message.chat.id}').mkdir(
+        parents=True, exist_ok=True
+    )
     file = update.message.photo[-1].get_file()
-    downloaded_file = file.download('downloaded_file.jpg')
-    src = f'media/{update.message.chat.id}' + 'downloaded_file.jpg'
-    with open(src, 'wb') as new_file:
-        new_file.write(downloaded_file)
-    # # явно указано имя файла!
-    # # откроем файл на чтение  преобразуем в base64
-    # with open(f'files/{message.chat.id}/photos/file_0.jpg', "rb") as image_file:
-    #     encoded_string = base64.b64encode(image_file.read())
-
-    # context.user_data[IMAGE] = encoded_string
+    file.download(f'media/temp/{update.message.chat.id}/downloaded_file.jpg')
+    with open(
+        f'media/temp/{update.message.chat.id}/downloaded_file.jpg', 'rb'
+    ) as image_file:
+        encoded_string = base64.b64encode(image_file.read())
+    context.user_data[IMAGE] = (
+        'data:image/png;base64,' + encoded_string.decode()
+    )
     update.message.reply_text('Спасибо! Отчет отправлен!')
     requests.post(settings.ENDPOINT, json=context.user_data)
-    print(context.user_data)
     return ConversationHandler.END
 
 
