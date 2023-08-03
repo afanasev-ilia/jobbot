@@ -160,4 +160,4 @@ cython_debug/
 #.idea/
 
 # папки со статикой и медиа
-backend/image/
+backend/media/
