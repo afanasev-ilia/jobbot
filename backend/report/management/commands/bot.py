@@ -105,7 +105,7 @@ def image_handler(update: Update, context: CallbackContext) -> int:
     context.user_data[IMAGE] = (
         'data:image/png;base64,' + encoded_string.decode()
     )
-    
+
     requests.post(settings.ENDPOINT, json=context.user_data)
     button = ReplyKeyboardMarkup(
         [['Отчет о проделанной работе'], ['Отчет об уборке рабочего места']],
@@ -113,11 +113,6 @@ def image_handler(update: Update, context: CallbackContext) -> int:
     )
     update.message.reply_text('Спасибо! Отчет отправлен!',
                               reply_markup=button,)
-    # context.bot.send_message(
-    #     chat_id=update.effective_chat.id,
-    #     text='Здравствуйте! Пожалуйста, выберите тип отчета',
-    #     reply_markup=button,
-    # )
     return ConversationHandler.END
 
 
