@@ -2,7 +2,6 @@ import logging
 import requests
 import base64
 
-from django.core.management.base import BaseCommand
 from django.conf import settings
 from pathlib import Path
 from telegram import ReplyKeyboardMarkup, ReplyKeyboardRemove, Update
@@ -135,59 +134,52 @@ def after_work_report(
     )
 
 
-class Command(BaseCommand):
-    help = 'Telegram-бот'
-
-    def handle(self, *args, **options):
-        updater = (
-            Updater(token=settings.TELEGRAM_TOKEN)
-        )
-
-        report_handler = ConversationHandler(
-            entry_points=[
-                MessageHandler(
-                    Filters.text('Отчет о проделанной работе'),
-                    work_report,
-                ),
-            ],
-            states={
-                ORDER: [
-                    MessageHandler(
-                        Filters.all,
-                        order_handler,
-                    ),
-                ],
-                ITEM_ORDER: [
-                    MessageHandler(
-                        Filters.all,
-                        item_handler,
-                    ),
-                ],
-                EXECUTION_TIME: [
-                    MessageHandler(
-                        Filters.all,
-                        time_handler,
-                    ),
-                ],
-                IMAGE: [
-                    MessageHandler(
-                        Filters.all,
-                        image_handler,
-                    ),
-                ],
-            },
-            fallbacks=[
-                CommandHandler('cancel', cancel_handler),
-            ],
-        )
-
-        updater.dispatcher.add_handler(CommandHandler('start', start))
-        updater.dispatcher.add_handler(report_handler)
-        updater.dispatcher.add_handler(
+report_handler = ConversationHandler(
+    entry_points=[
+        MessageHandler(
+            Filters.text('Отчет о проделанной работе'),
+            work_report,
+        ),
+    ],
+    states={
+        ORDER: [
             MessageHandler(
-                Filters.text('Отчет об уборке рабочего места'),
-                after_work_report,
+                Filters.all,
+                order_handler,
             ),
-         )
-        updater.start_polling()
-        updater.idle()
+        ],
+        ITEM_ORDER: [
+            MessageHandler(
+                Filters.all,
+                item_handler,
+            ),
+        ],
+        EXECUTION_TIME: [
+            MessageHandler(
+                Filters.all,
+                time_handler,
+            ),
+        ],
+        IMAGE: [
+            MessageHandler(
+                Filters.all,
+                image_handler,
+            ),
+        ],
+    },
+    fallbacks=[
+        CommandHandler('cancel', cancel_handler),
+    ],
+)
+
+updater = (
+    Updater(token=settings.TELEGRAM_TOKEN)
+)
+updater.dispatcher.add_handler(CommandHandler('start', start))
+updater.dispatcher.add_handler(report_handler)
+updater.dispatcher.add_handler(
+    MessageHandler(
+        Filters.text('Отчет об уборке рабочего места'),
+        after_work_report,
+    ),
+)
