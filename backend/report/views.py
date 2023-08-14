@@ -1,8 +1,12 @@
 import csv
 
-from django.http import HttpResponse
+from django.shortcuts import HttpResponse, render
 
 from report.models import Report
+
+
+def index(request):
+    return render(request, 'report/index.html',)
 
 
 def export_excel(request):
