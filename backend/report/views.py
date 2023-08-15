@@ -2,11 +2,13 @@ import csv
 
 from django.shortcuts import HttpResponse, render
 
+from report.forms import DownloadReportForm
 from report.models import Report
 
 
 def index(request):
-    return render(request, 'report/index.html',)
+    form = DownloadReportForm()
+    return render(request, 'report/index.html', {'form': form})
 
 
 def export_excel(request):
