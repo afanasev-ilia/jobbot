@@ -1,11 +1,11 @@
 from django import forms
 
-from report.models import Employee, Report
+from report.models import Employee, WorkReport
 
 
 class DownloadReportForm(forms.ModelForm):
     class Meta:
-        model = Report
+        model = WorkReport
         employee = forms.ModelChoiceField(
             queryset=Employee.objects.all(),
             widget=forms.Select(

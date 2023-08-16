@@ -3,7 +3,7 @@ import csv
 from django.shortcuts import HttpResponse, render
 
 from report.forms import DownloadReportForm
-from report.models import Report
+from report.models import WorkReport
 
 
 def index(request):
@@ -12,7 +12,7 @@ def index(request):
 
 
 def export_excel(request):
-    reports = Report.objects.all()
+    reports = WorkReport.objects.all()
     response = HttpResponse(
         reports,
         content_type='application/vnd.ms-excel;charset=utf-8',

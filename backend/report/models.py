@@ -22,7 +22,7 @@ class Employee(models.Model):
         return self.full_name
 
 
-class Report(models.Model):
+class WorkReport(models.Model):
     employee = models.ForeignKey(
         Employee,
         on_delete=models.PROTECT,
@@ -53,6 +53,30 @@ class Report(models.Model):
     )
 
     class Meta:
-        default_related_name = 'report'
-        verbose_name = 'отчет'
-        verbose_name_plural = 'отчеты'
+        default_related_name = 'work_report'
+        verbose_name = 'отчет о работе'
+        verbose_name_plural = 'отчеты о работе'
+
+
+class CleanReport(models.Model):
+    employee = models.ForeignKey(
+        Employee,
+        on_delete=models.PROTECT,
+        verbose_name='сотрудник',
+        help_text='укажите сотрудника',
+    )
+    image = models.ImageField(
+        'фотография',
+        blank=True,
+        upload_to='image/',
+        help_text='добавьте фотографию',
+    )
+    report_date = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name='время заполнения отчета',
+    )
+
+    class Meta:
+        default_related_name = 'clean_report'
+        verbose_name = 'отчет об уборке'
+        verbose_name_plural = 'отчеты об уборке'

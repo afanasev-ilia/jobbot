@@ -1,9 +1,9 @@
 from django.contrib import admin
 
-from report.models import Employee, Report
+from report.models import Employee, WorkReport
 
 
-@admin.register(Report)
+@admin.register(WorkReport)
 class ReportAdmin(admin.ModelAdmin):
     list_display = (
         'employee',
@@ -25,6 +25,7 @@ class ReportAdmin(admin.ModelAdmin):
     list_filter = (
         'employee',
     )
+
 
 @admin.register(Employee)
 class EmployeeAdmin(admin.ModelAdmin):
