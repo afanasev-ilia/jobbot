@@ -1,10 +1,10 @@
 from django.contrib import admin
 
-from report.models import Employee, WorkReport
+from report.models import Employee, WorkReport, CleanReport
 
 
 @admin.register(WorkReport)
-class ReportAdmin(admin.ModelAdmin):
+class WorkReportAdmin(admin.ModelAdmin):
     list_display = (
         'employee',
         'order',
@@ -24,6 +24,22 @@ class ReportAdmin(admin.ModelAdmin):
     )
     list_filter = (
         'employee',
+    )
+
+
+@admin.register(CleanReport)
+class CleanReportAdmin(admin.ModelAdmin):
+    list_display = (
+        'employee',
+        'image',
+        'report_date',
+    )
+    empty_value_display = '-пусто-'
+    search_fields = (
+        'employee',
+    )
+    list_filter = (
+        'report_date',
     )
 
 
