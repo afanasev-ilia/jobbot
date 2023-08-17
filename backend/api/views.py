@@ -2,13 +2,13 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from api.serializers import ReportSerializer
+from api.serializers import WorkReportSerializer
 
 
 @api_view(['POST'])
 def report_list(request):
     if request.method == 'POST':
-        serializer = ReportSerializer(data=request.data)
+        serializer = WorkReportSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

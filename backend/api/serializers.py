@@ -2,7 +2,7 @@ import base64
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
-from report.models import WorkReport
+from report.models import CleanReport, WorkReport
 
 
 class Base64ImageField(serializers.ImageField):
@@ -15,9 +15,16 @@ class Base64ImageField(serializers.ImageField):
         return super().to_internal_value(data)
 
 
-class ReportSerializer(serializers.ModelSerializer):
+class WorkReportSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=False, allow_null=True)
 
     class Meta:
         model = WorkReport
         fields = ('employee', 'order', 'item_order', 'execution_time', 'image')
+
+class CleanReportSerializer(serializers.ModelSerializer):
+    image = Base64ImageField(required=False, allow_null=True)
+
+    class Meta:
+        model = CleanReport
+        fields = ('employee', 'image')
