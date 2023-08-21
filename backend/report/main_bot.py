@@ -26,11 +26,16 @@ logging.basicConfig(
     ),
 )
 
-EMPLOYEE, ORDER, ITEM_ORDER, EXECUTION_TIME, IMAGE = (
+WORK_EMPLOYEE, ORDER, ITEM_ORDER, EXECUTION_TIME, WORK_IMAGE = (
     'employee',
     'order',
     'item_order',
     'execution_time',
+    'image',
+)
+
+CLEAN_EMPLOYEE, CLEAN_IMAGE = (
+    'employee',
     'image',
 )
 
@@ -52,7 +57,7 @@ def work_report(
     update: Update,
     context: CallbackContext,
 ) -> int:
-    context.user_data[EMPLOYEE] = Employee.objects.get(
+    context.user_data[WORK_EMPLOYEE] = Employee.objects.get(
         external_id=update.effective_chat.id
     ).id
     update.message.reply_text(
@@ -88,11 +93,10 @@ def time_handler(
 ) -> int:
     context.user_data[EXECUTION_TIME] = int(update.message.text)
     update.message.reply_text('Приложите фотографию')
-    return IMAGE
+    return WORK_IMAGE
 
 
 def image_encode(update: Update) -> bytes:
-    print(type(update))
     Path(f'media/temp/{update.message.chat.id}').mkdir(
         parents=True, exist_ok=True
     )
@@ -105,9 +109,9 @@ def image_encode(update: Update) -> bytes:
         return encoded_string
 
 
-def image_handler(update: Update, context: CallbackContext) -> int:
+def work_image_handler(update: Update, context: CallbackContext) -> int:
     encoded_string = image_encode(update)
-    context.user_data[IMAGE] = (
+    context.user_data[WORK_IMAGE] = (
         'data:image/png;base64,' + encoded_string.decode()
     )
 
@@ -129,18 +133,37 @@ def cancel_handler(
     return ConversationHandler.END
 
 
-def after_work_report(
+def clean_report(
         update: Update,
         context: CallbackContext,
 ) -> int:
-    chat = update.effective_chat
-    context.bot.send_message(
-        chat_id=chat.id,
-        text='Отчет об уборке рабочего места',
+    context.user_data[CLEAN_EMPLOYEE] = Employee.objects.get(
+        external_id=update.effective_chat.id
+    ).id
+    update.message.reply_text(
+        'Приложите фотографию',
+        reply_markup=ReplyKeyboardRemove(),
+    )
+    return CLEAN_IMAGE
+
+
+def clean_image_handler(update: Update, context: CallbackContext) -> int:
+    encoded_string = image_encode(update)
+    context.user_data[CLEAN_IMAGE] = (
+        'data:image/png;base64,' + encoded_string.decode()
     )
 
+    requests.post(settings.CLEAN_ENDPOINT, json=context.user_data)
+    button = ReplyKeyboardMarkup(
+        [['Отчет о проделанной работе'], ['Отчет об уборке рабочего места']],
+        resize_keyboard=True,
+    )
+    update.message.reply_text('Спасибо! Отчет отправлен!',
+                              reply_markup=button,)
+    return ConversationHandler.END
 
-report_handler = ConversationHandler(
+
+work_report_handler = ConversationHandler(
     entry_points=[
         MessageHandler(
             Filters.text('Отчет о проделанной работе'),
@@ -166,10 +189,36 @@ report_handler = ConversationHandler(
                 time_handler,
             ),
         ],
-        IMAGE: [
+        WORK_IMAGE: [
             MessageHandler(
                 Filters.all,
-                image_handler,
+                work_image_handler,
+            ),
+        ],
+    },
+    fallbacks=[
+        CommandHandler('cancel', cancel_handler),
+    ],
+)
+
+clean_report_handler = ConversationHandler(
+    entry_points=[
+        MessageHandler(
+            Filters.text('Отчет об уборке рабочего места'),
+            clean_report,
+        ),
+    ],
+    states={
+        ORDER: [
+            MessageHandler(
+                Filters.all,
+                order_handler,
+            ),
+        ],
+        CLEAN_IMAGE: [
+            MessageHandler(
+                Filters.all,
+                clean_image_handler,
             ),
         ],
     },
@@ -182,10 +231,5 @@ updater = (
     Updater(token=settings.TELEGRAM_TOKEN)
 )
 updater.dispatcher.add_handler(CommandHandler('start', start))
-updater.dispatcher.add_handler(report_handler)
-updater.dispatcher.add_handler(
-    MessageHandler(
-        Filters.text('Отчет об уборке рабочего места'),
-        after_work_report,
-    ),
-)
+updater.dispatcher.add_handler(work_report_handler)
+updater.dispatcher.add_handler(clean_report_handler)
