@@ -22,6 +22,7 @@ class WorkReportSerializer(serializers.ModelSerializer):
         model = WorkReport
         fields = ('employee', 'order', 'item_order', 'execution_time', 'image')
 
+
 class CleanReportSerializer(serializers.ModelSerializer):
     image = Base64ImageField(required=False, allow_null=True)
 

@@ -91,7 +91,8 @@ def time_handler(
     return IMAGE
 
 
-def image_handler(update: Update, context: CallbackContext) -> int:
+def image_encode(update: Update) -> bytes:
+    print(type(update))
     Path(f'media/temp/{update.message.chat.id}').mkdir(
         parents=True, exist_ok=True
     )
@@ -101,11 +102,16 @@ def image_handler(update: Update, context: CallbackContext) -> int:
         f'media/temp/{update.message.chat.id}/downloaded_file.jpg', 'rb'
     ) as image_file:
         encoded_string = base64.b64encode(image_file.read())
+        return encoded_string
+
+
+def image_handler(update: Update, context: CallbackContext) -> int:
+    encoded_string = image_encode(update)
     context.user_data[IMAGE] = (
         'data:image/png;base64,' + encoded_string.decode()
     )
 
-    requests.post(settings.ENDPOINT, json=context.user_data)
+    requests.post(settings.WORK_ENDPOINT, json=context.user_data)
     button = ReplyKeyboardMarkup(
         [['Отчет о проделанной работе'], ['Отчет об уборке рабочего места']],
         resize_keyboard=True,
