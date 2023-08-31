@@ -33,10 +33,10 @@ def download_report(request: HttpRequest) -> HttpResponse:
 
     # Define the titles for columns
     columns = [
-        'order',
-        'item_order',
-        'execution_time',
-        'report_date',
+        'номер заказа покупателя',
+        'номер позиции в заказе покупателя',
+        'время выполнения(минут)',
+        'время заполнения отчета',
     ]
     row_num = 1
 
