@@ -1,9 +1,10 @@
 import csv
 
-from django.shortcuts import HttpResponse, render
+from django.shortcuts import HttpResponse, render, get_object_or_404
+from django.http import HttpRequest
 
 from report.forms import DownloadReportForm
-from report.models import WorkReport
+from report.models import Employee
 
 
 def index(request):
@@ -11,8 +12,9 @@ def index(request):
     return render(request, 'report/index.html', {'form': form})
 
 
-def export_excel(request):
-    reports = WorkReport.objects.all()
+def download_report(request: HttpRequest) -> HttpResponse:
+    employee = get_object_or_404(Employee, id=request.POST.get('employee'))
+    reports = employee.work_report.select_related('employee')
     response = HttpResponse(
         reports,
         content_type='application/vnd.ms-excel;charset=utf-8',

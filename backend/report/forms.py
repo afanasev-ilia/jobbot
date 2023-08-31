@@ -10,19 +10,10 @@ class DownloadReportForm(forms.ModelForm):
             queryset=Employee.objects.all(),
             widget=forms.Select(
                 attrs={
-                    'cols': '40',
-                    'rows': '10',
+                    'cols': '100',
+                    'rows': '500',
                     'class': 'form-control',
                 },
             ),
         )
         fields = ('employee',)
-        # widgets = {
-        #     'text': forms.Textarea(
-        #         attrs={
-        #             'cols': '40',
-        #             'rows': '10',
-        #             'class': 'form-control',
-        #         },
-        #     ),
-        # }

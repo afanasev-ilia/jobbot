@@ -1,12 +1,14 @@
 <!DOCTYPE html> 
-<html lang="ru">
+<html lang='ru'>
   <head>
     <title>Скачать отчет</title>
   </head>
   <body>
     <h1>Скачать отчет</h1>
-    <form>
+    <form action="{% url 'report:download_report' %}" method='post'>
+      {% csrf_token %}
       {{ form }}
+      <button type='submit'>Скачать отчет</button>
     </form>
   </body>
 </html> 
