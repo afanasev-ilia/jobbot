@@ -49,10 +49,12 @@ class EmployeeAdmin(admin.ModelAdmin):
         'id',
         'external_id',
         'full_name',
+        'name',
     )
     empty_value_display = '-пусто-'
     list_editable = (
         'full_name',
+        'name',
     )
     search_fields = (
         'full_name',

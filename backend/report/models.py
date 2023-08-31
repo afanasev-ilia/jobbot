@@ -12,6 +12,11 @@ class Employee(models.Model):
         max_length=150,
         help_text='укажите ФИО cотрудника',
     )
+    name = models.CharField(
+        'ФИО сотрудника латиницей',
+        max_length=150,
+        help_text='укажите имя cотрудника латиницей',
+    )
 
     class Meta:
         default_related_name = 'employee'
@@ -19,7 +24,7 @@ class Employee(models.Model):
         verbose_name_plural = 'сотрудники'
 
     def __str__(self) -> str:
-        return self.full_name
+        return self.name
 
 
 class WorkReport(models.Model):

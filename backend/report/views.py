@@ -18,7 +18,7 @@ def download_report(request: HttpRequest) -> HttpResponse:
     response = HttpResponse(
         content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     )
-    response['Content-Disposition'] = 'attachment; filename={date}-movies.xlsx'.format(
+    response['Content-Disposition'] = 'attachment; filename={date}-{emplo}.xlsx'.format(
         date=datetime.now().strftime('%Y-%m-%d'),
     )
     workbook = Workbook()
