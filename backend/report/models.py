@@ -24,7 +24,7 @@ class Employee(models.Model):
         verbose_name_plural = 'сотрудники'
 
     def __str__(self) -> str:
-        return self.name
+        return self.full_name
 
 
 class WorkReport(models.Model):
