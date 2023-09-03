@@ -2,6 +2,7 @@ from datetime import datetime
 from django.shortcuts import HttpResponse, render, get_object_or_404
 from django.http import HttpRequest
 from openpyxl import Workbook
+from openpyxl.utils import get_column_letter
 
 from report.forms import DownloadReportForm
 from report.models import Employee
@@ -35,6 +36,10 @@ def download_report(request: HttpRequest) -> HttpResponse:
     for col_num, column_title in enumerate(columns, 1):
         cell = worksheet.cell(row=row_num, column=col_num)
         cell.value = column_title
+        column_letter = get_column_letter(col_num)
+        column_dimensions = worksheet.column_dimensions[column_letter]
+        column_dimensions.width = 35
+
     for report in reports:
         row_num += 1
         row = [
