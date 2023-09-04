@@ -4,11 +4,17 @@
     <title>Скачать отчет</title>
   </head>
   <body>
-    <h1>Скачать отчет</h1>
-    <form action="{% url 'report:download_report' %}" method='post'>
-      {% csrf_token %}
-      {{ form }}
-      <button type='submit'>Скачать отчет</button>
-    </form>
+    <main>
+      <div class="container py-5">
+        <div class="mb-5">
+          <h1>Скачать отчет</h1>
+          <form action="{% url 'report:download_report' %}" method='post'>
+            {% csrf_token %}
+            {{ form }}
+            <button type='submit'>Скачать отчет</button>
+          </form>
+        </div>
+      </div>
+    </main>
   </body>
 </html> 
